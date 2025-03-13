@@ -20,7 +20,9 @@ RUN npm run build
 FROM node:18-alpine
 
 # Install `serve` globally
-RUN npm install -g serve
+# RUN npm install -g serve
+RUN npm install -g serve --verbose || (echo "serve installation failed" && cat /root/.npm/_logs/*.log)
+
 
 # Set the working directory
 WORKDIR /app
