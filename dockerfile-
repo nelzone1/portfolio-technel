@@ -1,3 +1,4 @@
+# Try using Yarn
 # Use an official Node.js runtime as the base image for the build stage
 FROM node:18-alpine AS builder
 
