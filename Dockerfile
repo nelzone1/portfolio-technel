@@ -33,3 +33,4 @@ EXPOSE 3000
 
 # Command to run the app using the locally installed `serve`
 CMD ["./node_modules/.bin/serve", "-s", "dist", "-l", "3000"]
+
