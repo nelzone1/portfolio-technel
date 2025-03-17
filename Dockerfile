@@ -1,41 +1,32 @@
-# Use an official Node.js runtime as the base image
-FROM node:18-alpine AS builder
+# Use official Node.js image for build
+FROM node:18-alpine as build
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json first (for caching dependencies)
-COPY package.json package-lock.json ./
+# Copy package.json and package-lock.json (or yarn.lock) to the container
+COPY package*.json ./
 
-# Install dependencies with retry logic
-RUN npm install || (echo "Retrying npm install..." && sleep 5 && npm install)
+# Install dependencies
+RUN npm install
 
-# Copy the rest of the application code
+# Copy the rest of the application code to the container
 COPY . .
 
-# Build the project (assuming it uses a frontend framework like React, Vue, or Angular)
+# Verify if the dependency is installed (this should print the react-router-dom version)
+RUN npm list react-router-dom
+
+# Build the React app
 RUN npm run build
 
-# Use a lightweight web server to serve static files
-FROM node:18-alpine
+# Use Nginx as a lightweight production server
+FROM nginx:alpine
 
-# Configure DNS to use Google's DNS for better resolution
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+# Copy the build files from the build stage to Nginx's public directory
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Install Yarn globally (optional, depending on your preference)
-RUN npm install -g yarn
+# Expose port 80 for serving the app
+EXPOSE 80
 
-# Install `serve` using Yarn globally (you can also use npm if you prefer)
-RUN yarn global add serve || (echo "Retrying Yarn install..." && sleep 5 && yarn global add serve)
-
-# Set the working directory
-WORKDIR /app
-
-# Copy built files from the previous stage
-COPY --from=builder /app/dist ./dist
-
-# Expose the port on which the app runs
-EXPOSE 3000
-
-# Command to run the app using `serve`
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
