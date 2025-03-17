@@ -1,32 +1,23 @@
-# Use official Node.js image for build
-FROM node:18-alpine as build
+# Use an official Node runtime as a parent image
+FROM node:16-alpine
 
-# Set the working directory inside the container
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock) to the container
+# Copy package.json and package-lock.json first to install dependencies
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code to the container
+# Copy the rest of your application code
 COPY . .
 
-# Verify if the dependency is installed (this should print the react-router-dom version)
+# Check if react-router-dom is installed (or run your build or start script)
 RUN npm list react-router-dom
 
-# Build the React app
-RUN npm run build
+# Expose the port the app runs on
+EXPOSE 3000
 
-# Use Nginx as a lightweight production server
-FROM nginx:alpine
-
-# Copy the build files from the build stage to Nginx's public directory
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Expose port 80 for serving the app
-EXPOSE 80
-
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Command to run the app
+CMD ["npm", "start"]
