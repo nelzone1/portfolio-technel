@@ -20,7 +20,9 @@ RUN npm run build
 FROM node:18-alpine
 
 # Install `serve` globally
-RUN npm install -g serve
+# RUN npm install -g serve
+# Install the latest npm version
+RUN npm install -g npm@latest
 
 # Set the working directory
 WORKDIR /app
