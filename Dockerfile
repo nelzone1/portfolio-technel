@@ -1,37 +1,26 @@
-# Use an official Node.js runtime as the base image
-FROM node:18-alpine AS builder
+# Step 1: Use official node image
+FROM node:18-slim AS builder
 
-# Set the working directory in the container
+# Step 2: Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first (for caching dependencies)
-COPY package.json package-lock.json ./
+# Step 3: Copy package.json and package-lock.json (if available)
+COPY package*.json ./
 
-# Install dependencies
+# Step 4: Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Step 5: Copy the rest of the application
 COPY . .
 
-# Build the project (assuming it uses a frontend framework like React, Vue, or Angular)
+# Step 6: Build the app (assuming you're using vite)
 RUN npm run build
 
-# Use a lightweight web server to serve static files
-FROM node:18-alpine
+# Step 7: Install `serve` globally to serve static files
+RUN npm install -g serve
 
-# Install `serve` globally
-# RUN npm install -g serve
-# Install the latest npm version
-RUN npm install -g npm@latest
-
-# Set the working directory
-WORKDIR /app
-
-# Copy built files from the previous stage
-COPY --from=builder /app/dist ./dist
-
-# Expose the port on which the app runs
+# Step 8: Expose the port your app will run on
 EXPOSE 3000
 
-# Command to run the app
+# Step 9: Serve the build directory with `serve`
 CMD ["serve", "-s", "dist", "-l", "3000"]
