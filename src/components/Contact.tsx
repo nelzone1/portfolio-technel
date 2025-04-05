@@ -47,7 +47,7 @@ export default function Contact() {
             <div className="mt-8 pt-8 border-t border-gray-700">
               <div className="flex items-center justify-center space-x-2 text-gray-400">
                 <Mail className="w-5 h-5" />
-                <span>contact@devops-engineer.com</span>
+                <span>obohnelson1@gmail.com</span>
               </div>
             </div>
           </div>
